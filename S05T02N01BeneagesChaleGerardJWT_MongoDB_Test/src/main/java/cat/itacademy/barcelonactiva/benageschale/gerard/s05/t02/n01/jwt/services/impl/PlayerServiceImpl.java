@@ -1,10 +1,14 @@
-package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services;
+package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.impl;
 
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Game;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Player;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.dto.PlayerDTO;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.EmptyDataBase;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.ExistingNameException;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.NotEnoughGames;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.repository.PlayerRepository;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +19,7 @@ import java.util.List;
 
 
 @Service
-public class PlayerServiceImpl implements  PlayerService{
+public class PlayerServiceImpl implements PlayerService {
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -33,7 +37,7 @@ public class PlayerServiceImpl implements  PlayerService{
                 .orElse(false);
 
         if(copy){
-            return "nom existent";
+            throw new ExistingNameException("Jugador amb nom: '" + player.getName() + "' ja existeix a la base de dades!");
         }
         if(player.getName().replaceAll(" ", "").isEmpty()){
             player.setName("ANONYMOUS");
@@ -66,24 +70,21 @@ public class PlayerServiceImpl implements  PlayerService{
     @Override
     public String updatePlayer(Player updatePlayer, String idPlayer) {
 
-        if(updatePlayer!=null) {
-            Player playerTemp = playerRepository.findById(idPlayer).orElseThrow(PlayerNotFoundException::new);
-            Boolean copy = playerRepository.findAll().stream()
-                    .filter(p -> p.getName().equals(updatePlayer.getName()))
-                    .findFirst()
-                    .map(p -> true)
-                    .orElse(false);
-            if (copy) {
-                return "nom existent";
-            }
-            if (updatePlayer.getName().replaceAll(" ", "").isEmpty()) {
-                updatePlayer.setName("ANONYMOUS");
-            }
-            playerTemp.setName(updatePlayer.getName());
-            playerRepository.save(playerTemp);
-            return "Canvis realitzats amb èxit";
+        Player playerTemp = playerRepository.findById(idPlayer).orElseThrow(PlayerNotFoundException::new);
+        Boolean copy = playerRepository.findAll().stream()
+                .filter(p -> p.getName().equals(updatePlayer.getName()))
+                .findFirst()
+                .map(p -> true)
+                .orElse(false);
+        if (copy) {
+            throw new ExistingNameException("Jugador amb nom: '" + playerTemp.getName() + "' ja existeix a la base de dades!");
         }
-        return "Null";
+        if (updatePlayer.getName().replaceAll(" ", "").isEmpty()) {
+            updatePlayer.setName("ANONYMOUS");
+        }
+        playerTemp.setName(updatePlayer.getName());
+        playerRepository.save(playerTemp);
+        return "Canvis realitzats amb èxit";
     }
 
     @Override
@@ -101,18 +102,16 @@ public class PlayerServiceImpl implements  PlayerService{
 
     @Override
     public List<Player> findAllPlayers() {
-        return playerRepository.findAll();
+        List<Player> players = playerRepository.findAll();
+        if(players.isEmpty()){
+            throw new EmptyDataBase("No hi han jugadors a la base de dades!");
+        }
+        return players;
     }
 
     @Override
     public PlayerDTO playerConverter(String idPlayer) {
-        /*Player player = playerRepository.findById(idPlayer).orElseThrow(PlayerNotFoundException::new);
 
-        double wins = (double) player.getGames().stream()
-                .filter(fl -> fl.getDice1() + fl.getDice2() == 7)
-                .count();
-
-        return new PlayerDTO(player.getId(), player.getName(), (wins/player.getGames().size())*100);*/
         Player player = playerRepository.findById(idPlayer).orElseThrow(PlayerNotFoundException::new);
 
         long wins = player.getGames().stream()
@@ -132,9 +131,12 @@ public class PlayerServiceImpl implements  PlayerService{
 
         List<PlayerDTO> dtoPlayers = new ArrayList<PlayerDTO>();
         List<Player> flPlayerList = findAllPlayers().stream()
-                .filter(fl-> !fl.getGames().isEmpty())
+                .filter(fl-> fl.getGames().size() > 15)
                 .toList();
 
+        if(flPlayerList.isEmpty()){
+            throw new NotEnoughGames("No hi ha jugadors amb partides suficients.");
+        }
         flPlayerList.forEach(p -> dtoPlayers.add(playerConverter(p.getId())));
 
         return dtoPlayers.stream()
@@ -147,9 +149,12 @@ public class PlayerServiceImpl implements  PlayerService{
 
         List<PlayerDTO> dtoPlayers = new ArrayList<PlayerDTO>();
         List<Player> flPlayerList = findAllPlayers().stream()
-                .filter(fl-> !fl.getGames().isEmpty())
+                .filter(fl-> fl.getGames().size() > 15)
                 .toList();
 
+        if(flPlayerList.isEmpty()){
+            throw new NotEnoughGames("No hi ha jugadors amb partides suficients.");
+        }
         flPlayerList.forEach(p -> dtoPlayers.add(playerConverter(p.getId())));
 
         return dtoPlayers.stream()
@@ -172,8 +177,12 @@ public class PlayerServiceImpl implements  PlayerService{
     public Double totalWinPercent() {
         List<PlayerDTO> dtoPlayers = new ArrayList<PlayerDTO>();
         List<Player> flPlayerList = playerRepository.findAll().stream()
-                .filter(fl-> !fl.getGames().isEmpty())
+                .filter(fl-> fl.getGames().size() > 15)
                 .toList();
+
+        if(flPlayerList.isEmpty()){
+            throw new NotEnoughGames("No hi ha jugadors amb partides suficients.");
+        }
 
         flPlayerList.forEach(p -> dtoPlayers.add(playerConverter(p.getId())));
 

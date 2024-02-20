@@ -4,6 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 
 public class PlayerNotFoundException extends EntityNotFoundException {
 
+    private static final long serialVersionUID = 1L;
+
     public PlayerNotFoundException() {
         super("Jugador no existent!");
     }

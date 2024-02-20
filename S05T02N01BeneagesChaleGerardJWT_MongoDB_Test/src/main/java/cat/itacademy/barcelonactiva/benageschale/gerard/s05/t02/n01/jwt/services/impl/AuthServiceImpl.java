@@ -1,4 +1,4 @@
-package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services;
+package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.impl;
 
 
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.dao.request.SignInRequest;
@@ -10,6 +10,8 @@ import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.reposito
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.enums.Role;
 
 
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.AuthService;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

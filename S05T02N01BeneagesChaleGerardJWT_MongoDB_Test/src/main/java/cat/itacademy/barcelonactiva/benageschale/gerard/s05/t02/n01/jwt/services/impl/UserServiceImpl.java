@@ -1,7 +1,7 @@
-package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services;
+package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.impl;
 
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

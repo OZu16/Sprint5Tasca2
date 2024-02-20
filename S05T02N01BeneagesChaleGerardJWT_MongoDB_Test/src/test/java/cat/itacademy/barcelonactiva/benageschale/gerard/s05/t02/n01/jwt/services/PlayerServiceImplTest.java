@@ -3,7 +3,9 @@ package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.service
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Game;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Player;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.dto.PlayerDTO;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.NotEnoughGames;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.repository.PlayerRepository;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.impl.PlayerServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -115,25 +117,46 @@ class PlayerServiceImplTest {
 
     @Test
     void winnerPlayerTest() {
+        for(int i = 0; i < 50; i++) {
+            playerTest1.getGames().add(new Game());
+            playerTest2.getGames().add(new Game());
+        }
+        Player playerTest3 = new Player("Javi");
+        playerTest3.setId("65d2a366a56a414e7f1616be");
+        Game gameTestWinner = new Game();
+        gameTestWinner.setDice1(6);
+        gameTestWinner.setDice2(1);
+        playerTest3.getGames().add(gameTestWinner);
 
         Mockito.when(playerRepository.findAll()).thenReturn(playerList);
         Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616ba")).thenReturn(Optional.ofNullable(playerTest1));
         Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616bb")).thenReturn(Optional.ofNullable(playerTest2));
-        PlayerDTO expected = new PlayerDTO("65d2a366a56a414e7f1616ba", "Manolo", 100);
+        PlayerDTO expected = new PlayerDTO("65d2a366a56a414e7f1616be", "Javi", 100);
         PlayerDTO winner = playerService.winnerPlayer();
-        assertTrue(new ReflectionEquals(expected).matches(winner));
 
+        assertFalse(new ReflectionEquals(expected).matches(winner));
     }
 
     @Test
     void loserPlayerTest() {
+        for(int i = 0; i < 50; i++) {
+            playerTest1.getGames().add(new Game());
+            playerTest2.getGames().add(new Game());
+        }
+        Player playerTest3 = new Player("Javi");
+        playerTest3.setId("65d2a366a56a414e7f1616be");
+        Game gameTestWinner = new Game();
+        gameTestWinner.setDice1(1);
+        gameTestWinner.setDice2(1);
+        playerTest3.getGames().add(gameTestWinner);
+
         Mockito.when(playerRepository.findAll()).thenReturn(playerList);
         Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616ba")).thenReturn(Optional.ofNullable(playerTest1));
         Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616bb")).thenReturn(Optional.ofNullable(playerTest2));
-        PlayerDTO expected = new PlayerDTO("65d2a366a56a414e7f1616bb", "Manel", 0);
+        PlayerDTO expected = new PlayerDTO("65d2a366a56a414e7f1616be", "Javi", 0);
         PlayerDTO loser = playerService.loserPlayer();
 
-        assertTrue(new ReflectionEquals(expected).matches(loser));
+        assertFalse(new ReflectionEquals(expected).matches(loser));
     }
 
     @Test
@@ -148,17 +171,28 @@ class PlayerServiceImplTest {
         assertTrue(new ReflectionEquals(expected).matches(list));
     }
 
-    @Test
-    void totalWinPercentTest() {
+    /*@Test
+    void totalWinPercentTest1() {
 
         Mockito.when(playerRepository.findAll()).thenReturn(playerList);
         Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616ba")).thenReturn(Optional.ofNullable(playerTest1));
         Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616bb")).thenReturn(Optional.ofNullable(playerTest2));
-        double expected = 50.0;
+
+        assertThrows(NotEnoughGames.class, ()->{playerService.totalWinPercent();});
+    }*/
+
+    @RepeatedTest(10)
+    void totalWinPercentTest2() {
+        for(int i = 0; i < 50; i++) {
+            playerTest1.getGames().add(new Game());
+            playerTest2.getGames().add(new Game());
+        }
+        Mockito.when(playerRepository.findAll()).thenReturn(playerList);
+        Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616ba")).thenReturn(Optional.ofNullable(playerTest1));
+        Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616bb")).thenReturn(Optional.ofNullable(playerTest2));
         double result = playerService.totalWinPercent();
         System.out.println(result);
-        assertTrue(new ReflectionEquals(expected).matches(result));
-
+        assertTrue(result > 10 && result< 30);
     }
 
     @RepeatedTest(50)

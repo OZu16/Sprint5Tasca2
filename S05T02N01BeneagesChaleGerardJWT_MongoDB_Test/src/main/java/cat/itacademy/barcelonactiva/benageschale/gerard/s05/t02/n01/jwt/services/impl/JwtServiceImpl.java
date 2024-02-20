@@ -1,6 +1,7 @@
-package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services;
+package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.impl;
 
 
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,8 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import static io.jsonwebtoken.Jwts.ENC.get;
 
 @Service
 public class JwtServiceImpl implements JwtService {
