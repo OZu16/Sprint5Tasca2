@@ -11,7 +11,7 @@ public interface PlayerService {
 
     public String playGame(String idPlayer);
 
-    public Player findPlayer(String idPlayer);
+    public Player findPlayerGames(String idPlayer);
 
     public String updatePlayer(Player player, String idPlayer);
 

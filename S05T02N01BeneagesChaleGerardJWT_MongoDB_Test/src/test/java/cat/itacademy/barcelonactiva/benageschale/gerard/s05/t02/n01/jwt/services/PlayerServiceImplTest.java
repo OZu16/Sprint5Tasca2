@@ -3,6 +3,7 @@ package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.service
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Game;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Player;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.dto.PlayerDTO;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.ExistingNameException;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.NotEnoughGames;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.repository.PlayerRepository;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.impl.PlayerServiceImpl;
@@ -171,15 +172,11 @@ class PlayerServiceImplTest {
         assertTrue(new ReflectionEquals(expected).matches(list));
     }
 
-    /*@Test
+    @Test
     void totalWinPercentTest1() {
-
-        Mockito.when(playerRepository.findAll()).thenReturn(playerList);
-        Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616ba")).thenReturn(Optional.ofNullable(playerTest1));
-        Mockito.when(playerRepository.findById("65d2a366a56a414e7f1616bb")).thenReturn(Optional.ofNullable(playerTest2));
-
-        assertThrows(NotEnoughGames.class, ()->{playerService.totalWinPercent();});
-    }*/
+        NotEnoughGames neg = assertThrows(NotEnoughGames.class, ()->playerService.totalWinPercent());
+        Assertions.assertTrue(new ReflectionEquals("No hi ha jugadors amb partides suficients.").matches((String) neg.getMessage()));
+    }
 
     @RepeatedTest(10)
     void totalWinPercentTest2() {
@@ -219,8 +216,12 @@ class PlayerServiceImplTest {
 
         Mockito.when(playerRepository.findAll()).thenReturn(playerList);
 
-        System.out.println(playerService.savePlayer(playerJavi));
-        System.out.println(playerService.savePlayer(playerANONYMOUS));
-        System.out.println(playerService.savePlayer(playerRepeated));
+        String javiCreated = playerService.savePlayer(playerJavi);
+        String anonymousCreated = playerService.savePlayer(playerANONYMOUS);
+        Assertions.assertTrue(new ReflectionEquals("Jugador :Javi amb ID: 65d2a366a56a414e7f1616be creat amb exit!").matches(javiCreated));
+        Assertions.assertTrue(new ReflectionEquals("Jugador :ANONYMOUS amb ID: 65d2a366a56a414e7f1616bf creat amb exit!").matches(anonymousCreated));
+
+        ExistingNameException ene = assertThrows(ExistingNameException.class, ()-> playerService.savePlayer(playerRepeated));
+        Assertions.assertTrue(new ReflectionEquals("Jugador amb nom: 'Manolo' ja existeix a la base de dades!").matches((String) ene.getMessage()));
     }
 }

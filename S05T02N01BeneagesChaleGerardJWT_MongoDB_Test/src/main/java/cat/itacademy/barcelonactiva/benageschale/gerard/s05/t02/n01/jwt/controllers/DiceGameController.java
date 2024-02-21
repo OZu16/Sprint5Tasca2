@@ -49,8 +49,8 @@ public class DiceGameController {
     }
 
     @GetMapping(value = "/get_player_games/{id}")
-    public ResponseEntity<Player> findPlayer(@PathVariable("id") String id) {
-        return new ResponseEntity<>(playerService.findPlayer(id), HttpStatus.OK);
+    public ResponseEntity<Player> findPlayerGames(@PathVariable("id") String id) {
+        return new ResponseEntity<>(playerService.findPlayerGames(id), HttpStatus.OK);
     }
 
     @GetMapping("/get_player/{id}/win_percent")

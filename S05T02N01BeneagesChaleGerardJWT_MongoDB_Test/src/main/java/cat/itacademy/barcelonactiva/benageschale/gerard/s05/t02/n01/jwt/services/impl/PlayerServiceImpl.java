@@ -3,10 +3,7 @@ package cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.service
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Game;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.domain.Player;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.dto.PlayerDTO;
-import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.EmptyDataBase;
-import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.ExistingNameException;
-import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.NotEnoughGames;
-import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.PlayerNotFoundException;
+import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.exceptions.*;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.repository.PlayerRepository;
 import cat.itacademy.barcelonactiva.benageschale.gerard.s05.t02.n01.jwt.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +60,12 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Player findPlayer(String idPlayer) {
-        return playerRepository.findById(idPlayer).orElseThrow(PlayerNotFoundException::new);
+    public Player findPlayerGames(String idPlayer) {
+        Player player = playerRepository.findById(idPlayer).orElseThrow(PlayerNotFoundException::new);
+        if(player.getGames().isEmpty()){
+            throw new PlayerWithoutGames("Aquest jugador no té partides!");
+        }
+        return player;
     }
 
     @Override
@@ -96,6 +97,9 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void deletePlayerGames(String idPlayer) {
         Player playerTemp = playerRepository.findById(idPlayer).orElseThrow(PlayerNotFoundException::new);
+        if(playerTemp.getGames().isEmpty()){
+            throw new PlayerWithoutGames("Jugador: '" + playerTemp.getName() + "' no te partides registrades!");
+        }
         playerTemp.getGames().clear();
         playerRepository.save(playerTemp);
     }
@@ -170,6 +174,9 @@ public class PlayerServiceImpl implements PlayerService {
                 allGames.addAll(p.getGames());
             }
         });
+        if(allGames.isEmpty()){
+            throw new EmptyDataBase("No hi han jocs a la base de dades!");
+        }
         return allGames;
     }
 
